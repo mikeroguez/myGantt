@@ -1,3 +1,4 @@
 $(function() {
 	prettyPrint();
+	$("#myGantt").myGantt();
 });
