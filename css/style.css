@@ -1,0 +1,22 @@
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	padding: 0 0 50px 0;
+}
+
+.contain {
+	width: 800px;
+	margin: 0 auto;
+}
+
+h1 {
+	margin: 40px 0 20px 0;
+}
+
+h2 {
+	font-size: 1.5em;
+	padding-bottom: 3px;
+	border-bottom: 1px solid #DDD;
+	margin-top: 50px;
+	margin-bottom: 25px;
+}
