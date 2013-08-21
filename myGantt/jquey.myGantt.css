@@ -1,0 +1,8 @@
+.taskDepLine {
+	margin: 0;
+	padding:0;
+	border: 1px solid #9999ff;
+	 background-color:#9999ff;
+	overflow: hidden;
+	position: absolute;
+}
