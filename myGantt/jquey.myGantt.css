@@ -1,8 +1,15 @@
-.taskDepLine {
-	margin: 0;
-	padding:0;
-	border: 1px solid #9999ff;
-	 background-color:#9999ff;
-	overflow: hidden;
-	position: absolute;
+.myGantt-link-lines {
+	border-style: solid; 
+	border-color: #9999ff; 
+}
+
+.myGantt-link-lines-arrow {
+	background-image:url('imgs/linkArrow.png');
+}
+
+
+
+.myGantt-node{
+	background-color:#ccc;
+	z-index: 100000;
 }

@@ -40,29 +40,38 @@
 
 			init: function (element) {
 				// To init and call "render" method (not done)
-				var myGantt = $("<div>");
-				myGantt.addClass("myGantt").css({position:"absolute",top:0,width:"100%",height:"100%"});
-				$("body").append(myGantt);
+				element = $(element);
 
 				var links = $("<div>");
-				links.addClass("ganttLinks").css({position:"absolute",top:0,width:"100%",height:"100%"});
-				$(myGantt).append(links);
+				links.addClass("myGantt-Links").css({position:"relative",top:0,width:"100%",height:"100%"});
+				element.append(links);
 
 				var node1 = $("<div>");
-				node1.css({position:"absolute",top:"10px", left:"10px",width:"10px",height:"10px", border:"1px solid red"});
-				$(myGantt).append(node1);
+				node1.addClass("myGantt-node").css({position:"absolute",top:"10px", left:"200px",width:"10px",height:"10px", border:"1px solid red"});
+				links.append(node1);
 
 				var node2 = $("<div>");
-				node2.css({position:"absolute",top:"760px", left:"460px",width:"10px",height:"10px", border:"1px solid blue"});
-				$(myGantt).append(node2);
+				node2.addClass("myGantt-node").css({position:"absolute",top:"50px", left:"50px",width:"10px",height:"10px", border:"1px solid blue"});
+				links.append(node2);
 
 				var node3 = $("<div>");
-				node3.css({position:"absolute",top:"660px", left:"360px",width:"10px",height:"10px", border:"1px solid green"});
-				$(myGantt).append(node3);
+				node3.addClass("myGantt-node").css({position:"absolute",top:"100px", left:"360px",width:"10px",height:"10px", border:"1px solid green"});
+				links.append(node3);
+
+				var node4 = $("<div>");
+				node4.addClass("myGantt-node").css({position:"absolute",top:"200px", left:"360px",width:"10px",height:"10px", border:"1px solid pink"});
+				links.append(node4);
+
+				var node5 = $("<div>");
+				node5.addClass("myGantt-node").css({position:"absolute",top:"300px", left:"40px",width:"10px",height:"10px", border:"1px solid pink"});
+				links.append(node5);
 
 
-				this.drawLink(node1, node2, null, myGantt);
-				this.drawLink(node1, node3, null, myGantt);
+				this.drawLink(node1, node2, null, element);
+				this.drawLink(node1, node3, null, element);
+				this.drawLink(node1, node4, null, element);
+				this.drawLink(node2, node5, null, element);
+
 
 			},
 
@@ -96,18 +105,19 @@
 					ADAPTED BY MikeRoguez
 				*/
 				var peduncolusSize = 10;
-				var lineSize = 0;
+				var lineSize = 1;
 
 				/**
 				* A representation of a Horizontal line
 				*/
 				function HLine(width, top, left) {
-					var hl = $("<div>").addClass("taskDepLine");
+					var hl = $("<div>").addClass("myGantt-link-lines");
 					hl.css({
-						height: lineSize,
+						"border-width": lineSize+"px 0px 0px",
 						left: left,
 						width: width,
-						top: top - lineSize / 2
+						top: top - lineSize / 2,
+						position: "absolute"
 					});
 					return hl;
 				};
@@ -117,12 +127,13 @@
 				* A representation of a Vertical line
 				*/
 				function VLine(height, top, left) {
-					var vl = $("<div>").addClass("taskDepLine");
+					var vl = $("<div>").addClass("myGantt-link-lines");
 					vl.css({
 						height: height,
 						left:left - lineSize / 2,
-						width: lineSize,
-						top: top
+						"border-width": "0px 0px 0px "+lineSize+"px",
+						top: top,
+						position: "absolute"
 					});
 					return vl;
 				};				
@@ -224,10 +235,12 @@
 					}
 
 					//arrow
-					var arr = $("<img src='linkArrow.png'>").css({
+					var arr = $("<div>").addClass("myGantt-link-lines-arrow").css({
 						position: 'absolute',
 						top: rectTo.top + rectTo.height / 2 - 5,
-						left: rectTo.left - 5
+						left: rectTo.left - 5,
+						width:"5px",
+						height:"10px"
 					});
 
 					ndo.append(arr);
@@ -323,10 +336,12 @@
 					}
 
 					//arrow
-					var arr = $("<img src='linkArrow.png'>").css({
+					var arr = $("<div>").addClass("myGantt-link-lines-arrow").css({
 						position: 'absolute',
 						top: rectTo.top + rectTo.height / 2 - 5,
-						left: rectTo.left - 5
+						left: rectTo.left - 5,
+						width:"5px",
+						height:"10px"
 					});
 
 					ndo.append(arr);
@@ -339,11 +354,11 @@
 
 				// Dispatch to the correct renderer
 				if (type == 'start-to-start') {
-					myGantt.find(".ganttLinks").append(
+					myGantt.find(".myGantt-Links").append(
 						drawStartToStart(rectFrom, rectTo, peduncolusSize)
 					);
 				} else {
-					myGantt.find(".ganttLinks").append(
+					myGantt.find(".myGantt-Links").append(
 						drawStartToEnd(rectFrom, rectTo, peduncolusSize)
 					);
 				}
