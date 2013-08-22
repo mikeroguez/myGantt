@@ -1,6 +1,6 @@
 (function ($, undefined) {
 	
-	"use strict";
+	/*"use strict";*/
 
 	$.fn.myGantt = function (options) {
 		var scales = ["hours", "days", "weeks", "months"];
@@ -10,6 +10,9 @@
 			months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
 			dow: ["S", "M", "T", "W", "T", "F", "S"]
 		};
+		//line settings
+		var lineOptions = {lsize: 1, lcolor: "#9999ff", lstyle: "solid"};
+
 		/**
 		* Extend options with default values
 		*/
@@ -57,8 +60,10 @@
 
 				$.each(myData, function(index, value) {
 					if( typeof value.children != "undefined"){
-						$.each(value.children, function(idx, nodeId){
-							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+nodeId), null, element);
+						$.each(value.children, function(idx, node){
+							var lineThis = $.extend(true, lineOptions);
+							lineThis = $.extend(lineThis, node.line);
+							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+node.id), null, element, lineThis);
 						});
 					};
 				});				
@@ -67,7 +72,7 @@
 			/**************************************
 			+ DRAW LINKS
 			***************************************/
-			drawLink: function (from, to, type, myGantt) {
+			drawLink: function (from, to, type, myGantt, line) {
 				/*
 				  Copyright (c) 2012-2013 Open Lab
 				  Written by Roberto Bicchierai and Silvia Chelazzi http://roberto.open-lab.com
@@ -94,18 +99,19 @@
 					ADAPTED BY MikeRoguez
 				*/
 				var peduncolusSize = 10;
-				var lineSize = 1;
 
 				/**
 				* A representation of a Horizontal line
 				*/
-				function HLine(width, top, left) {
+				function HLine(width, top, left, line) {
 					var hl = $("<div>").addClass("myGantt-link-lines");
 					hl.css({
-						"border-width": lineSize+"px 0px 0px",
+						"border-width": line.lsize+"px 0px 0px",
+						"border-style": line.lstyle,
+						"border-color": line.lcolor,
 						left: left,
 						width: width,
-						top: top - lineSize / 2,
+						top: top - line.lsize / 2,
 						position: "absolute"
 					});
 					return hl;
@@ -115,12 +121,14 @@
 				/**
 				* A representation of a Vertical line
 				*/
-				function VLine(height, top, left) {
+				function VLine(height, top, left, line) {
 					var vl = $("<div>").addClass("myGantt-link-lines");
 					vl.css({
 						height: height,
-						left:left - lineSize / 2,
-						"border-width": "0px 0px 0px "+lineSize+"px",
+						left:left - line.lsize / 2,
+						"border-width": "0px 0px 0px "+line.lsize+"px",
+						"border-style": line.lstyle,
+						"border-color": line.lcolor,						
 						top: top,
 						position: "absolute"
 					});
@@ -144,7 +152,7 @@
 				*
 				* @see buildRect
 				*/
-				function drawStartToEnd(rectFrom, rectTo, peduncolusSize) {
+				function drawStartToEnd(rectFrom, rectTo, peduncolusSize, line) {
 					var left, top;
 
 					var ndo = $("<div>").attr({
@@ -160,7 +168,7 @@
 					if (!useThreeLine) {
 						// L1
 						if (peduncolusSize > 0) {
-							var l1 = new HLine(peduncolusSize, currentY, currentX);
+							var l1 = new HLine(peduncolusSize, currentY, currentX, line);
 							currentX = currentX + peduncolusSize;
 							ndo.append(l1);
 						}
@@ -169,9 +177,9 @@
 						var l2_4size = ((rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2)) / 2;
 						var l2;
 						if (l2_4size < 0) {
-							l2 = new VLine(-l2_4size, currentY + l2_4size, currentX);
+							l2 = new VLine(-l2_4size, currentY + l2_4size, currentX, line);
 						} else {
-							l2 = new VLine(l2_4size, currentY, currentX);
+							l2 = new VLine(l2_4size, currentY, currentX, line);
 						}
 						currentY = currentY + l2_4size;
 						ndo.append(l2);
@@ -179,15 +187,15 @@
 						// L3
 						var l3size = rectFrom.left + rectFrom.width + peduncolusSize - (rectTo.left - peduncolusSize);
 						currentX = currentX - l3size;
-						var l3 = new HLine(l3size, currentY, currentX);
+						var l3 = new HLine(l3size, currentY, currentX, line);
 						ndo.append(l3);
 
 						// L4
 						var l4;
 						if (l2_4size < 0) {
-							l4 = new VLine(-l2_4size, currentY + l2_4size, currentX);
+							l4 = new VLine(-l2_4size, currentY + l2_4size, currentX, line);
 						} else {
-							l4 = new VLine(l2_4size, currentY, currentX);
+							l4 = new VLine(l2_4size, currentY, currentX, line);
 						}
 						ndo.append(l4);
 
@@ -195,14 +203,14 @@
 
 						// L5
 						if (peduncolusSize > 0) {
-							var l5 = new HLine(peduncolusSize, currentY, currentX);
+							var l5 = new HLine(peduncolusSize, currentY, currentX, line, line);
 							currentX = currentX + peduncolusSize;
 							ndo.append(l5);
 						}
 					} else {
 						//L1
 						var l1_3Size = (rectTo.left - currentX) / 2;
-						var l1 = new HLine(l1_3Size, currentY, currentX);
+						var l1 = new HLine(l1_3Size, currentY, currentX, line);
 						currentX = currentX + l1_3Size;
 						ndo.append(l1);
 
@@ -210,15 +218,15 @@
 						var l2Size = ((rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2));
 						var l2;
 						if (l2Size < 0) {
-							l2 = new VLine(-l2Size, currentY + l2Size, currentX);
+							l2 = new VLine(-l2Size, currentY + l2Size, currentX, line);
 						} else {
-							l2 = new VLine(l2Size, currentY, currentX);
+							l2 = new VLine(l2Size, currentY, currentX, line);
 						}
 						ndo.append(l2);
 						currentY = currentY + l2Size;
 
 						//L3
-						var l3 = new HLine(l1_3Size, currentY, currentX);
+						var l3 = new HLine(l1_3Size, currentY, currentX, line);
 						currentX = currentX + l1_3Size;
 						ndo.append(l3);
 					}
@@ -242,7 +250,7 @@
 				*
 				* @see buildRect
 				*/
-				function drawStartToStart(rectFrom, rectTo, peduncolusSize) {
+				function drawStartToStart(rectFrom, rectTo, peduncolusSize, line) {
 					var left, top;
 
 					var ndo = $("<div>").attr({
@@ -258,7 +266,7 @@
 					if (!useThreeLine) {
 						// L1
 						if (peduncolusSize > 0) {
-							var l1 = new HLine(peduncolusSize, currentY, currentX - peduncolusSize);
+							var l1 = new HLine(peduncolusSize, currentY, currentX - peduncolusSize, line);
 							currentX = currentX - peduncolusSize;
 							ndo.append(l1);
 						}
@@ -267,9 +275,9 @@
 						var l2_4size = ((rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2)) / 2;
 						var l2;
 						if (l2_4size < 0) {
-							l2 = new VLine(-l2_4size, currentY + l2_4size, currentX);
+							l2 = new VLine(-l2_4size, currentY + l2_4size, currentX, line);
 						} else {
-							l2 = new VLine(l2_4size, currentY, currentX);
+							l2 = new VLine(l2_4size, currentY, currentX, line);
 						}
 						currentY = currentY + l2_4size;
 
@@ -278,15 +286,15 @@
 						// L3
 						var l3size = (rectFrom.left - peduncolusSize) - (rectTo.left - peduncolusSize);
 						currentX = currentX - l3size;
-						var l3 = new HLine(l3size, currentY, currentX);
+						var l3 = new HLine(l3size, currentY, currentX, line);
 						ndo.append(l3);
 
 						// L4
 						var l4;
 						if (l2_4size < 0) {
-							l4 = new VLine(-l2_4size, currentY + l2_4size, currentX);
+							l4 = new VLine(-l2_4size, currentY + l2_4size, currentX, line);
 						} else {
-							l4 = new VLine(l2_4size, currentY, currentX);
+							l4 = new VLine(l2_4size, currentY, currentX, line);
 						}
 						ndo.append(l4);
 
@@ -294,14 +302,14 @@
 
 						// L5
 						if (peduncolusSize > 0) {
-							var l5 = new HLine(peduncolusSize, currentY, currentX);
+							var l5 = new HLine(peduncolusSize, currentY, currentX, line);
 							currentX = currentX + peduncolusSize;
 							ndo.append(l5);
 						}
 					} else {
 						//L1
 
-						var l1 = new HLine(peduncolusSize, currentY, currentX - peduncolusSize);
+						var l1 = new HLine(peduncolusSize, currentY, currentX - peduncolusSize, line);
 						currentX = currentX - peduncolusSize;
 						ndo.append(l1);
 
@@ -309,9 +317,9 @@
 						var l2Size = ((rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2));
 						var l2;
 						if (l2Size < 0) {
-							l2 = new VLine(-l2Size, currentY + l2Size, currentX);
+							l2 = new VLine(-l2Size, currentY + l2Size, currentX, line);
 						} else {
-							l2 = new VLine(l2Size, currentY, currentX);
+							l2 = new VLine(l2Size, currentY, currentX, line);
 						}
 						ndo.append(l2);
 
@@ -319,7 +327,7 @@
 
 						//L3
 
-						var l3 = new HLine(peduncolusSize + (rectTo.left - rectFrom.left), currentY, currentX);
+						var l3 = new HLine(peduncolusSize + (rectTo.left - rectFrom.left), currentY, currentX, line);
 						currentX = currentX + peduncolusSize + (rectTo.left - rectFrom.left);
 						ndo.append(l3);
 					}
@@ -344,11 +352,11 @@
 				// Dispatch to the correct renderer
 				if (type == 'start-to-start') {
 					myGantt.find(".myGantt-Links").append(
-						drawStartToStart(rectFrom, rectTo, peduncolusSize)
+						drawStartToStart(rectFrom, rectTo, peduncolusSize, line)
 					);
 				} else {
 					myGantt.find(".myGantt-Links").append(
-						drawStartToEnd(rectFrom, rectTo, peduncolusSize)
+						drawStartToEnd(rectFrom, rectTo, peduncolusSize, line)
 					);
 				}
 			} // END drawLink
