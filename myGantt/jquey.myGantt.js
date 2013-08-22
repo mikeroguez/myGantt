@@ -35,44 +35,33 @@
 						core.init(element);
 					});
 				}
-
 			},
 
 			init: function (element) {
-				// To init and call "render" method (not done)
+				this.render(element);
+			},
+
+			render: function(element){
+				var myData = element.data;
 				element = $(element);
 
 				var links = $("<div>");
 				links.addClass("myGantt-Links").css({position:"relative",top:0,width:"100%",height:"100%"});
 				element.append(links);
 
-				var node1 = $("<div>");
-				node1.addClass("myGantt-node").css({position:"absolute",top:"10px", left:"200px",width:"10px",height:"10px", border:"1px solid red"});
-				links.append(node1);
+				$.each(myData, function(index, value) {
+					var node = $("<div>");
+					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top:(1 + Math.floor(Math.random() * 400))+"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
+					links.append(node);
+				});
 
-				var node2 = $("<div>");
-				node2.addClass("myGantt-node").css({position:"absolute",top:"50px", left:"50px",width:"10px",height:"10px", border:"1px solid blue"});
-				links.append(node2);
-
-				var node3 = $("<div>");
-				node3.addClass("myGantt-node").css({position:"absolute",top:"100px", left:"360px",width:"10px",height:"10px", border:"1px solid green"});
-				links.append(node3);
-
-				var node4 = $("<div>");
-				node4.addClass("myGantt-node").css({position:"absolute",top:"200px", left:"360px",width:"10px",height:"10px", border:"1px solid pink"});
-				links.append(node4);
-
-				var node5 = $("<div>");
-				node5.addClass("myGantt-node").css({position:"absolute",top:"300px", left:"40px",width:"10px",height:"10px", border:"1px solid pink"});
-				links.append(node5);
-
-
-				this.drawLink(node1, node2, null, element);
-				this.drawLink(node1, node3, null, element);
-				this.drawLink(node1, node4, null, element);
-				this.drawLink(node2, node5, null, element);
-
-
+				$.each(myData, function(index, value) {
+					if( typeof value.children != "undefined"){
+						$.each(value.children, function(idx, nodeId){
+							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+nodeId), null, element);
+						});
+					};
+				});				
 			},
 
 			/**************************************
@@ -159,8 +148,8 @@
 					var left, top;
 
 					var ndo = $("<div>").attr({
-						from: from.id,
-						to: to.id
+						from: from.attr("id"),
+						to: to.attr("id")
 					});
 
 					var currentX = rectFrom.left + rectFrom.width;
