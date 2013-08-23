@@ -2,7 +2,7 @@
 }
 
 .myGantt-link-lines-arrow {
-	background-image:url('imgs/linkArrow.png');
+	background-image:url(imgs/linkArrow.png);
 }
 
 .myGantt-node{
@@ -10,7 +10,27 @@
 	z-index: 100000;
 }
 
+
 .myGant-row{
-	min-height: 25px;
-	border: 1px dotted #BBB;
+	height: 24px;
+}
+
+.myGant-row.panel{
+	width: 100%;
+}
+
+.myGant-row.odd{
+	background-color: #eee;	
+}
+
+.myGant-row.day{
+	width: 24px;	
+}
+
+.myGant-row.dayGrid{
+    margin-left: 0px;
+    border-left: 1px solid #DDD;
+    background-image: url(imgs/grid.png);
+    background-repeat: repeat;
+    background-position: 24px 24px;
 }

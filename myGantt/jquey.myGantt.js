@@ -10,7 +10,7 @@
 			dow: ["S", "M", "T", "W", "T", "F", "S"]
 		};
 		//line settings
-		var lineOptions = {lsize: 2, lcolor: "#9999ff", lstyle: "solid"};
+		var lineOptions = {lsize: 1, lcolor: "#9999ff", lstyle: "solid"};
 
 		/**
 		* Extend options with default values
@@ -40,18 +40,15 @@
 			},
 
 			render: function(element){			
-				element.append(this.leftPanel(element));
-				element.append(this.rightPanel(element));
-
-				$.each(element.myGantt.data, function(index, value) {
-					if( typeof value.children != "undefined"){
-						$.each(value.children, function(idx, node){
-							var lineThis = $.extend(true, lineOptions);
-							lineThis = $.extend(lineThis, node.line);
-							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+node.id), null, element, lineThis);
-						});
-					};
+				var lP = this.leftPanel(element);
+				element.append(lP);
+				var rP = this.rightPanel(element)
+				element.append(rP);
+				rP.on('scroll', function () {
+    				lP.scrollTop($(this).scrollTop());
 				});
+				this.drawLinks(element);
+
 			},
 
 			leftPanel: function(element){
@@ -61,7 +58,8 @@
 					width: Math.round(element.myGantt.width/3) - 1 + "px",
 					position: "relative",
 					float: "left",
-					/*"border": "1px solid blue",*/
+					overflow:"hidden",
+					"overflow-x":"scroll"
 				});
 
 				var spacer = $("<div>");
@@ -69,7 +67,8 @@
 
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					title.attr( "id", "myGanttName-"+value.id).addClass("myGant-row");
+					var clase = "myGant-row" + (((index%2 == 0)) ? " " : " odd");
+					title.attr( "id", "myGanttName-"+value.id).addClass( clase );
 					var text = $("<span>");
 					text.html(value.name);
 					title.append(text);
@@ -79,21 +78,20 @@
 			},
 
 			rightPanel: function(element){
+				helpers.getDatesRange(element);
 				var rP = $("<div>").addClass("myGantt-leftPannel");
 				rP.css({
 					height: element.myGantt.height + "px",
 					width: Math.round(element.myGantt.width/3) * 2 + "px",
 					float: "right",
-					overflow:"scroll",
-					/*"border": "1px solid green",*/
+					overflow:"scroll"
 				});
 				this.drawNodes(element, rP);
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row");
+					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row dayGrid").css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * 24 + 25 + "px"});
 					rP.append(title);
 				});
-
 				return rP;
 			},
 
@@ -105,9 +103,23 @@
 
 				$.each(element.myGantt.data, function(index, value) {
 					var node = $("<div>");
-					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top + 8 +"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
+					var y = helpers.diffDates(element.myGantt.minDate, value.start) * 24 + 7;
+					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top + 8 +"px", left:y+"px",width:"10px",height:"10px", border:"1px solid red"});
 					links.append(node);
 				});
+			},
+
+			drawLinks: function(element){
+				helpers.getDaySize(element);
+				$.each(element.myGantt.data, function(index, value) {
+					if( typeof value.children != "undefined"){
+						$.each(value.children, function(idx, node){
+							var lineThis = $.extend(true, lineOptions);
+							lineThis = $.extend(lineThis, node.line);
+							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+node.id), null, element, lineThis);
+						});
+					};
+				});				
 			},
 
 			/**************************************
@@ -416,6 +428,36 @@
 					var title = element.find("#myGanttName-"+value.id);
 					element.myGantt.data[index].position = title.position();
 				});
+			},
+
+			getDaySize: function(element){
+				var testDayDiv = $("<div>").addClass("myGant-row day").css({visible:"none"});
+				element.append(testDayDiv);
+				element.myGantt.daySettings = {};
+				element.myGantt.daySettings.height = testDayDiv.height();
+				element.myGantt.daySettings.width = testDayDiv.width();
+				testDayDiv.remove();
+			}, 
+
+			getDatesRange: function(element){
+				element.myGantt.minDate = new Date();
+				element.myGantt.maxDate = element.myGantt.minDate;
+				$.each(element.myGantt.data, function(index, value) {
+					element.myGantt.data[index].start = helpers.parseDate(value.start);
+					if(element.myGantt.data[index].start  > element.myGantt.maxDate) element.myGantt.maxDate = element.myGantt.data[index].start;
+					if(element.myGantt.data[index].start  < element.myGantt.minDate) element.myGantt.minDate = element.myGantt.data[index].start;
+				});	
+			}, 
+
+			parseDate: function(date){
+				var parts = date.split('-');
+				// new Date(year, month [, date [, hours[, minutes[, seconds[, ms]]]]])
+				return new Date(parts[0], parts[1]-1, parts[2]); // months are 0-based
+			}, 
+
+			diffDates: function(firstDate, secondDate){
+				var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+				return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
 			}
 		}
 
