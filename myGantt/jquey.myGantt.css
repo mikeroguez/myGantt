@@ -5,9 +5,12 @@
 	background-image:url('imgs/linkArrow.png');
 }
 
-
-
 .myGantt-node{
 	background-color:#ccc;
 	z-index: 100000;
+}
+
+.myGant-row{
+	min-height: 25px;
+	border: 1px dotted #999;
 }

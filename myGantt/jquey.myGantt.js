@@ -1,9 +1,8 @@
 (function ($, undefined) {
 	
-	/*"use strict";*/
+	"use strict";
 
 	$.fn.myGantt = function (options) {
-		var scales = ["hours", "days", "weeks", "months"];
 		//Default settings
 		var settings = {
 			source: null,
@@ -21,44 +20,44 @@
 		}
 
 		var core = {
-
-			mifuncion: function(element){
-				alert(element);
-			},
-
 			create: function (element) {
 				// Initialize data with a json object or fetch via an xhr
 				// request depending on 'settings.source'
 				if (typeof settings.source !== "string") {
-					element.data = settings.source;
+					element.myGantt.data = settings.source;
 					core.init(element);
 				} else {
 					$.getJSON(settings.source, function (jsData) {
-						element.data = jsData;
+						element.myGantt.data = jsData;
 						core.init(element);
 					});
 				}
 			},
 
 			init: function (element) {
+				helpers.getRect(element);
 				this.render(element);
 			},
 
 			render: function(element){
-				var myData = element.data;
-				element = $(element);
-
+				var rP = this.rightPanel(element);
+				var lP = this.leftPanel(element)	
+				element.append(lP);
+				element.append(rP);
+				helpers.getNodesPosition(element);
 				var links = $("<div>");
 				links.addClass("myGantt-Links").css({position:"relative",top:0,width:"100%",height:"100%"});
-				element.append(links);
+				rP.append(links);
 
-				$.each(myData, function(index, value) {
+				$.each(element.myGantt.data, function(index, value) {
 					var node = $("<div>");
-					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top:(1 + Math.floor(Math.random() * 400))+"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
+					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top +"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
 					links.append(node);
 				});
 
-				$.each(myData, function(index, value) {
+				element.append(rP);
+				element.append(lP);
+				$.each(element.myGantt.data, function(index, value) {
 					if( typeof value.children != "undefined"){
 						$.each(value.children, function(idx, node){
 							var lineThis = $.extend(true, lineOptions);
@@ -66,7 +65,48 @@
 							core.drawLink($("#myGanttNode-"+value.id), $("#myGanttNode-"+node.id), null, element, lineThis);
 						});
 					};
+				});
+			},
+
+			leftPanel: function(element){
+				var lP = $("<div>").addClass("myGantt-rightPannel");
+				lP.css({
+					height: element.myGantt.height + "px",
+					width: Math.round(element.myGantt.width/3) - 1 + "px",
+					position: "relative",
+					/*"border": "1px solid blue",*/
+				});
+
+				var spacer = $("<div>");
+				lP.append(spacer);
+
+				$.each(element.myGantt.data, function(index, value) {
+					var title = $("<div>");
+					title.attr( "id", "myGanttName-"+value.id).addClass("myGant-row");
+					var text = $("<span>");
+					text.html(value.name);
+					title.append(text);
+					lP.append(title);
+				});
+				return lP;
+			},
+
+			rightPanel: function(element){
+				var rP = $("<div>").addClass("myGantt-leftPannel");
+				rP.css({
+					height: element.myGantt.height + "px",
+					width: Math.round(element.myGantt.width/3) * 2 + "px",
+					float: "right",
+					overflow:"scroll",
+					/*"border": "1px solid green",*/
+				});
+
+				$.each(element.myGantt.data, function(index, value) {
+					var title = $("<div>");
+					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row");
+					rP.append(title);
 				});				
+				return rP;
 			},
 
 			/**************************************
@@ -96,7 +136,7 @@
 				  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				*/
 				/*
-					ADAPTED BY MikeRoguez
+					MODIFIED BY MikeRoguez
 				*/
 				var peduncolusSize = 10;
 
@@ -362,9 +402,29 @@
 			} // END drawLink
 		}
 
+		
+		var helpers = {
+			getRect: function (element) {				
+				element.myGantt.position = element.position();
+				element.myGantt.width = element.width();
+				element.myGantt.height = element.height();
+			},
+
+			getNodesPosition: function(element){
+				$.each(element.myGantt.data, function(index, value) {
+					var title = element.find("#myGanttName-"+value.id);
+					element.myGantt.data[index].position = title.position();
+				});
+			}
+		}
+
 		this.each(function () {
-			this.data = null;
-			core.create(this);
-		});		
+			var $this = $(this);
+			$this.myGantt = {};
+			$this.myGantt.data = null;
+			core.create($this);
+		});
+
+		
 	};
 })(jQuery);

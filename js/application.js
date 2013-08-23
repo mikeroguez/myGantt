@@ -7,7 +7,8 @@ $(function() {
 			{id:2, name:"tarea 2", children:[{id:4}]},
 			{id:3, name:"tarea 3"},
 			{id:4, name:"tarea 4", children:[{id:5, line:{lcolor:"gray", lstyle:"dotted"}}]},
-			{id:5, name:"tarea 5"}
+			{id:5, name:"tarea 5"},
+			{id:6, name:"tarea 6 de Mike"}
 		]
 	}
 

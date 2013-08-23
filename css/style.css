@@ -20,3 +20,8 @@ h2 {
 	margin-top: 50px;
 	margin-bottom: 25px;
 }
+
+#myGantt{
+	min-height: 400px;
+	width: 100%;
+}
