@@ -10,7 +10,7 @@
 			dow: ["S", "M", "T", "W", "T", "F", "S"]
 		};
 		//line settings
-		var lineOptions = {lsize: 1, lcolor: "#9999ff", lstyle: "solid"};
+		var lineOptions = {lsize: 2, lcolor: "#9999ff", lstyle: "solid"};
 
 		/**
 		* Extend options with default values
@@ -39,24 +39,10 @@
 				this.render(element);
 			},
 
-			render: function(element){
-				var rP = this.rightPanel(element);
-				var lP = this.leftPanel(element)	
-				element.append(lP);
-				element.append(rP);
-				helpers.getNodesPosition(element);
-				var links = $("<div>");
-				links.addClass("myGantt-Links").css({position:"relative",top:0,width:"100%",height:"100%"});
-				rP.append(links);
+			render: function(element){			
+				element.append(this.leftPanel(element));
+				element.append(this.rightPanel(element));
 
-				$.each(element.myGantt.data, function(index, value) {
-					var node = $("<div>");
-					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top +"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
-					links.append(node);
-				});
-
-				element.append(rP);
-				element.append(lP);
 				$.each(element.myGantt.data, function(index, value) {
 					if( typeof value.children != "undefined"){
 						$.each(value.children, function(idx, node){
@@ -74,6 +60,7 @@
 					height: element.myGantt.height + "px",
 					width: Math.round(element.myGantt.width/3) - 1 + "px",
 					position: "relative",
+					float: "left",
 					/*"border": "1px solid blue",*/
 				});
 
@@ -100,13 +87,27 @@
 					overflow:"scroll",
 					/*"border": "1px solid green",*/
 				});
-
+				this.drawNodes(element, rP);
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
 					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row");
 					rP.append(title);
-				});				
+				});
+
 				return rP;
+			},
+
+			drawNodes: function(element, rP){
+				helpers.getNodesPosition(element);
+				var links = $("<div>");
+				links.addClass("myGantt-Links").css({position:"relative", float:"right", top:0,width:"100%",height:"100%"});
+				rP.append(links);
+
+				$.each(element.myGantt.data, function(index, value) {
+					var node = $("<div>");
+					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top + 8 +"px", left:(1 + Math.floor(Math.random() * 400))+"px",width:"10px",height:"10px", border:"1px solid red"});
+					links.append(node);
+				});
 			},
 
 			/**************************************
