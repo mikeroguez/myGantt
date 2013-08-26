@@ -35,6 +35,7 @@
 			},
 
 			init: function (element) {
+				helpers.getDaySize(element);
 				helpers.getRect(element);
 				this.render(element);
 			},
@@ -67,8 +68,7 @@
 
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					var clase = "myGant-row" + (((index%2 == 0)) ? " " : " odd");
-					title.attr( "id", "myGanttName-"+value.id).addClass( clase );
+					title.attr( "id", "myGanttName-"+value.id).addClass( "myGant-row row " + helpers.oddClass(index) );
 					var text = $("<span>");
 					text.html(value.name);
 					title.append(text);
@@ -89,7 +89,7 @@
 				this.drawNodes(element, rP);
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row dayGrid").css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * 24 + 25 + "px"});
+					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row dayGrid " + helpers.oddClass(index)).css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * 24 + 25 + "px"});
 					rP.append(title);
 				});
 				return rP;
@@ -103,14 +103,20 @@
 
 				$.each(element.myGantt.data, function(index, value) {
 					var node = $("<div>");
-					var y = helpers.diffDates(element.myGantt.minDate, value.start) * 24 + 7;
-					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({position:"absolute",top: value.position.top + 8 +"px", left:y+"px",width:"10px",height:"10px", border:"1px solid red"});
+					var startPosition = helpers.diffDates(element.myGantt.minDate, value.start) * element.myGantt.daySettings.width + element.myGantt.daySettings.width / 4;
+					var endPosition = helpers.diffDates(value.start, value.end) * element.myGantt.daySettings.width + element.myGantt.daySettings.width / 2;
+					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({
+						position:"absolute",
+						top: value.position.top + (element.myGantt.daySettings.height/2 - element.myGantt.barHeight/2) +"px", 
+						left: startPosition +"px",
+						width: endPosition + "px",
+						height: element.myGantt.barHeight + "px"
+					});
 					links.append(node);
 				});
 			},
 
 			drawLinks: function(element){
-				helpers.getDaySize(element);
 				$.each(element.myGantt.data, function(index, value) {
 					if( typeof value.children != "undefined"){
 						$.each(value.children, function(idx, node){
@@ -437,6 +443,7 @@
 				element.myGantt.daySettings.height = testDayDiv.height();
 				element.myGantt.daySettings.width = testDayDiv.width();
 				testDayDiv.remove();
+				element.myGantt.barHeight = element.myGantt.daySettings.height / 6 * 3; 
 			}, 
 
 			getDatesRange: function(element){
@@ -444,7 +451,8 @@
 				element.myGantt.maxDate = element.myGantt.minDate;
 				$.each(element.myGantt.data, function(index, value) {
 					element.myGantt.data[index].start = helpers.parseDate(value.start);
-					if(element.myGantt.data[index].start  > element.myGantt.maxDate) element.myGantt.maxDate = element.myGantt.data[index].start;
+					element.myGantt.data[index].end = helpers.parseDate(value.end);
+					if(element.myGantt.data[index].end  > element.myGantt.maxDate) element.myGantt.maxDate = element.myGantt.data[index].end;
 					if(element.myGantt.data[index].start  < element.myGantt.minDate) element.myGantt.minDate = element.myGantt.data[index].start;
 				});	
 			}, 
@@ -458,6 +466,10 @@
 			diffDates: function(firstDate, secondDate){
 				var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
 				return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
+			}, 
+
+			oddClass: function(data){
+				return (((data%2 == 0)) ? " " : " odd");
 			}
 		}
 
