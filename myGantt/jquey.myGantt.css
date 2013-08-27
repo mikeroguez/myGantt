@@ -17,7 +17,6 @@
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6e6b4', endColorstr='#ed9017',GradientType=0 ); /* IE6-9 */
 }
 
-
 .myGant-row{
 	height: 24px;
 }
@@ -28,6 +27,11 @@
     background-image: url(imgs/rowT.png);
     background-repeat: repeat;
     background-position: 24px 24px;
+}
+
+.myGant-row span{
+	margin-left:5px;
+	font: normal normal bold 1em helvetica, verdana, arial;
 }
 
 .myGant-row.panel{

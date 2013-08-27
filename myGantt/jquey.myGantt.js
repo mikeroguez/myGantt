@@ -56,7 +56,7 @@
 				var lP = $("<div>").addClass("myGantt-rightPannel");
 				lP.css({
 					height: element.myGantt.height + "px",
-					width: Math.round(element.myGantt.width/3) - 1 + "px",
+					width: Math.ceil(element.myGantt.width/3) - 1 + "px",
 					position: "relative",
 					float: "left",
 					overflow:"hidden",
@@ -68,7 +68,7 @@
 
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					title.attr( "id", "myGanttName-"+value.id).addClass( "myGant-row row " + helpers.oddClass(index) );
+					title.attr( "id", "myGanttName-"+value.id).addClass( "myGant-row row " + helpers.oddClass(index) ).css({overflow:"hidden"});
 					var text = $("<span>");
 					text.html(value.name);
 					title.append(text);
@@ -79,10 +79,11 @@
 
 			rightPanel: function(element){
 				helpers.getDatesRange(element);
+				this.drawRightHeader(element);
 				var rP = $("<div>").addClass("myGantt-leftPannel");
 				rP.css({
 					height: element.myGantt.height + "px",
-					width: Math.round(element.myGantt.width/3) * 2 + "px",
+					width: Math.ceil(element.myGantt.width/3) * 2 + "px",
 					float: "right",
 					overflow:"scroll"
 				});
@@ -126,6 +127,10 @@
 						});
 					};
 				});				
+			},
+
+			drawRightHeader: function(element){
+				var dates = helpers.DateRange(element.myGantt.minDate, element.myGantt.maxDate)
 			},
 
 			/**************************************
@@ -465,12 +470,24 @@
 
 			diffDates: function(firstDate, secondDate){
 				var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-				return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
+				return Math.ceil(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
 			}, 
 
 			oddClass: function(data){
 				return (((data%2 == 0)) ? " " : " odd");
-			}
+			},
+
+			DateRange: function (from, to) {
+				var current = new Date(from.getTime());
+				var end = new Date(to.getTime()); // <- never used?
+				var ret = [];
+				var i = 0;
+				do {
+					ret[i++] = new Date(current.getTime());
+					current.setDate(current.getDate() + 1);
+				} while (current.getTime() <= to.getTime());
+				return ret;
+            }
 		}
 
 		this.each(function () {
