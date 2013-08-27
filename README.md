@@ -30,3 +30,8 @@ $(function() {
 	$("#myGantt").myGantt(data);
 });
 ```
+
+Licence
+-------
+
+[MIT License!](https://raw.github.com/mikeroguez/myGantt/master/LICENSE)
