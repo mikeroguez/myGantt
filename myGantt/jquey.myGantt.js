@@ -63,7 +63,7 @@
 					"overflow-x":"scroll"
 				});
 
-				var spacer = $("<div>").attr("id", "myGantt-spacer").css({height:element.myGantt.daySettings.height*4+"px"});
+				var spacer = $("<div>").attr("id", "myGantt-spacer").css({height:element.myGantt.daySettings.height*4 - 1 +"px"});
 				lP.append(spacer);
 
 				$.each(element.myGantt.data, function(index, value) {
