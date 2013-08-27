@@ -29,6 +29,17 @@ $(function() {
 
 	$("#myGantt").myGantt(data);
 });
+
+
+$(function() {
+
+	var data = {
+		source:"http://myServer.com/myJson.php" /*a valid json*/
+	}
+
+	$("#myGantt").myGantt(data);
+});
+
 ```
 
 Licence

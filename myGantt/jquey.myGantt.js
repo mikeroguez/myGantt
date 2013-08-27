@@ -146,13 +146,13 @@
 
 				for (var i=0;i<dates.length;i++){ 
 					if( (last_date.getFullYear() != dates[i].getFullYear())){
-						years.push("<div class='myGantt-year' style='width:"+days_in_year*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+last_date.getFullYear()+"</span></div>");
+						years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1)+"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+last_date.getFullYear()+"</span></div>");
 						days_in_year = 0;
 					}
 					days_in_year++;
 
 					if( (last_date.getMonth() != dates[i].getMonth())){
-						months.push("<div class='myGantt-month' style='width:"+days_in_month*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+						months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
 						days_in_month = 0;
 					}
 					days_in_month++;
@@ -162,8 +162,8 @@
 					last_date = dates[i];
 				}
 
-				years.push("<div class='myGantt-year' style='width:"+days_in_year*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+last_date.getFullYear()+"</span></div>");
-				months.push("<div class='myGantt-month' style='width:"+days_in_month*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+				years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+last_date.getFullYear()+"</span></div>");
+				months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
 				
 				barYears.append(years.join(""));
 				barMonths.append(months.join(""));
