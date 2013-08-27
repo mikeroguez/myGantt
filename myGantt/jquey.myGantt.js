@@ -53,7 +53,7 @@
 			},
 
 			leftPanel: function(element){
-				var lP = $("<div>").addClass("myGantt-rightPannel");
+				var lP = $("<div>").addClass("myGantt-leftPannel");
 				lP.css({
 					height: element.myGantt.height + "px",
 					width: Math.ceil(element.myGantt.width/3) - 1 + "px",
@@ -63,7 +63,7 @@
 					"overflow-x":"scroll"
 				});
 
-				var spacer = $("<div>");
+				var spacer = $("<div>").attr("id", "myGantt-spacer").css({height:element.myGantt.daySettings.height*4+"px"});
 				lP.append(spacer);
 
 				$.each(element.myGantt.data, function(index, value) {
@@ -79,18 +79,18 @@
 
 			rightPanel: function(element){
 				helpers.getDatesRange(element);
-				this.drawRightHeader(element);
-				var rP = $("<div>").addClass("myGantt-leftPannel");
+				var rP = $("<div>").addClass("myGantt-rightPannel");
 				rP.css({
 					height: element.myGantt.height + "px",
 					width: Math.ceil(element.myGantt.width/3) * 2 + "px",
 					float: "right",
 					overflow:"scroll"
 				});
+				rP.append(this.drawRightHeader(element));
 				this.drawNodes(element, rP);
 				$.each(element.myGantt.data, function(index, value) {
 					var title = $("<div>");
-					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row dayGrid " + helpers.oddClass(index)).css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * 24 + 25 + "px"});
+					title.attr( "id", "myGanttRow-"+value.id).addClass("myGant-row dayGrid " + helpers.oddClass(index)).css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * element.myGantt.daySettings.width + element.myGantt.daySettings.width + "px"});
 					rP.append(title);
 				});
 				return rP;
@@ -99,16 +99,16 @@
 			drawNodes: function(element, rP){
 				helpers.getNodesPosition(element);
 				var links = $("<div>");
-				links.addClass("myGantt-Links").css({position:"relative", float:"right", top:0,width:"100%",height:"100%"});
+				links.addClass("myGantt-Links").css({position:"relative", float:"right", top:0,width:"100%"/*,height:"100%"*/});
 				rP.append(links);
-
+				var count = 0
 				$.each(element.myGantt.data, function(index, value) {
 					var node = $("<div>");
 					var startPosition = helpers.diffDates(element.myGantt.minDate, value.start) * element.myGantt.daySettings.width + element.myGantt.daySettings.width / 4;
 					var endPosition = helpers.diffDates(value.start, value.end) * element.myGantt.daySettings.width + element.myGantt.daySettings.width / 2;
 					node.attr( "id", "myGanttNode-"+value.id).addClass("myGantt-node").css({
 						position:"absolute",
-						top: value.position.top + (element.myGantt.daySettings.height/2 - element.myGantt.barHeight/2) +"px", 
+						top: count++ * (element.myGantt.daySettings.height) + (element.myGantt.daySettings.height/2 - element.myGantt.barHeight/1.5) +"px", 
 						left: startPosition +"px",
 						width: endPosition + "px",
 						height: element.myGantt.barHeight + "px"
@@ -130,7 +130,49 @@
 			},
 
 			drawRightHeader: function(element){
-				var dates = helpers.DateRange(element.myGantt.minDate, element.myGantt.maxDate)
+				var dates = helpers.DaysRange(element.myGantt.minDate, element.myGantt.maxDate);
+				var barDays = $("<div>").attr("id", "myGantt-barDays").addClass("myGant-row dayGrid").css({height:element.myGantt.daySettings.height*2+"px"});
+				var barMonths = $("<div>").attr("id", "myGantt-barMonths").addClass("myGant-row row");
+				var barYears = $("<div>").attr("id", "myGantt-barYears").addClass("myGant-row row");
+				
+				var years = [];
+				var months = [];
+				var day_dates = [];
+				var day_days = [];
+
+				var last_date = dates[0];
+				var days_in_year = 0;
+				var days_in_month = 0;
+
+				for (var i=0;i<dates.length;i++){ 
+					if( (last_date.getFullYear() != dates[i].getFullYear())){
+						years.push("<div class='myGantt-year' style='width:"+days_in_year*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+last_date.getFullYear()+"</span></div>");
+						days_in_year = 0;
+					}
+					days_in_year++;
+
+					if( (last_date.getMonth() != dates[i].getMonth())){
+						months.push("<div class='myGantt-month' style='width:"+days_in_month*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+						days_in_month = 0;
+					}
+					days_in_month++;
+
+					day_dates.push("<div class='myGantt-day' style='width:"+element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span style='margin-left:5px;'>"+dates[i].getDate()+"</span></div>");
+					day_days.push("<div class='myGantt-day' style='width:"+element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span style='margin-left:5px;'>"+ settings.dow[dates[i].getDay()]+"</span></div>");
+					last_date = dates[i];
+				}
+
+				years.push("<div class='myGantt-year' style='width:"+days_in_year*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+last_date.getFullYear()+"</span></div>");
+				months.push("<div class='myGantt-month' style='width:"+days_in_month*element.myGantt.daySettings.width+"px; height:"+element.myGantt.daySettings.height+"px;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+				
+				barYears.append(years.join(""));
+				barMonths.append(months.join(""));
+				barDays.append(day_dates.join(""));
+				barDays.append("<div style='clear:both;'></div>");
+				barDays.append(day_days.join(""));
+				var result = $("<div />").attr("id","rightHeader")
+				result.append(barYears).append(barMonths).append(barDays).append("<div style='clear:both;'></div>").css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * element.myGantt.daySettings.width + element.myGantt.daySettings.width +1+"px"});
+				return result;
 			},
 
 			/**************************************
@@ -452,7 +494,7 @@
 			}, 
 
 			getDatesRange: function(element){
-				element.myGantt.minDate = new Date();
+				element.myGantt.minDate = helpers.parseDate(element.myGantt.data[0].start);
 				element.myGantt.maxDate = element.myGantt.minDate;
 				$.each(element.myGantt.data, function(index, value) {
 					element.myGantt.data[index].start = helpers.parseDate(value.start);
@@ -477,7 +519,7 @@
 				return (((data%2 == 0)) ? " " : " odd");
 			},
 
-			DateRange: function (from, to) {
+			DaysRange: function (from, to) {
 				var current = new Date(from.getTime());
 				var end = new Date(to.getTime()); // <- never used?
 				var ret = [];

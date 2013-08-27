@@ -53,3 +53,18 @@
     background-repeat: repeat;
     background-position: 24px 24px;
 }
+
+.myGantt-year{
+	text-align: center;
+	border-right: 1px solid #DDD;
+	border-top: 1px solid #DDD;
+}
+
+.myGantt-month{
+	text-align: center;
+	border-right: 1px solid #DDD;
+}
+
+#myGantt-spacer{
+	border-bottom: 1px solid #DDD;
+}
