@@ -34,4 +34,4 @@ $(function() {
 Licence
 -------
 
-![Licence MIT](https://raw.github.com/mikeroguez/myGantt/master/LICENSE)
+![a link](https://raw.github.com/mikeroguez/myGantt/master/LICENSE)
