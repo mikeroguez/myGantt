@@ -146,13 +146,13 @@
 
 				for (var i=0;i<dates.length;i++){ 
 					if( (last_date.getFullYear() != dates[i].getFullYear())){
-						years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1)+"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+last_date.getFullYear()+"</span></div>");
+						years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1)+"px; height:"+element.myGantt.daySettings.height+"px; float:left; overflow-x:hidden;'><span>"+last_date.getFullYear()+"</span></div>");
 						days_in_year = 0;
 					}
 					days_in_year++;
 
 					if( (last_date.getMonth() != dates[i].getMonth())){
-						months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+						months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left; overflow-x:hidden;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
 						days_in_month = 0;
 					}
 					days_in_month++;
@@ -162,8 +162,8 @@
 					last_date = dates[i];
 				}
 
-				years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+last_date.getFullYear()+"</span></div>");
-				months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
+				years.push("<div class='myGantt-year' style='width:"+(days_in_year*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left; overflow-x:hidden;'><span>"+last_date.getFullYear()+"</span></div>");
+				months.push("<div class='myGantt-month' style='width:"+(days_in_month*element.myGantt.daySettings.width-1) +"px; height:"+element.myGantt.daySettings.height+"px; float:left; overflow-x:hidden;'><span>"+settings.months[last_date.getMonth()]+"</span></div>");
 				
 				barYears.append(years.join(""));
 				barMonths.append(months.join(""));
@@ -171,7 +171,7 @@
 				barDays.append("<div style='clear:both;'></div>");
 				barDays.append(day_days.join(""));
 				var result = $("<div />").attr("id","rightHeader")
-				result.append(barYears).append(barMonths).append(barDays).append("<div style='clear:both;'></div>").css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * element.myGantt.daySettings.width + element.myGantt.daySettings.width +1+"px"});
+				result.append(barYears).append("<div style='clear:both;'></div>").append(barMonths).append("<div style='clear:both;'></div>").append(barDays).append("<div style='clear:both;'></div>").css({width: helpers.diffDates(element.myGantt.maxDate,element.myGantt.minDate) * element.myGantt.daySettings.width + element.myGantt.daySettings.width +1+"px"});
 				return result;
 			},
 
@@ -512,7 +512,7 @@
 
 			diffDates: function(firstDate, secondDate){
 				var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-				return Math.ceil(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
+				return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
 			}, 
 
 			oddClass: function(data){
